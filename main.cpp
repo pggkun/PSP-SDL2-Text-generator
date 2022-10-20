@@ -48,5 +48,12 @@ int main()
         SDL_RenderPresent(renderer);
         SDL_UpdateWindowSurface(window);
     }
+    SDL_DestroyTexture(texture1);
+    SDL_DestroyTexture(texture2);
+    TTF_Quit();
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }
