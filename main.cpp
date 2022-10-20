@@ -34,19 +34,12 @@ int main()
     SDL_Renderer *renderer = SDL_CreateRenderer(window, 0, NULL);
 
     SDL_Texture *texture1, *texture2;
-
     SDL_Rect rect1, rect2;
 
     get_text_and_rect(renderer, 0, 0, "SDL2 + SDL TTF EXAMPLE", font, &texture1, &rect1);
     get_text_and_rect(renderer, 0, rect1.y + rect1.h, "Using Cambria Italic, size:24", font, &texture2, &rect2);
 
-    SDL_Rect my_rect;
-    my_rect.x = (480 - 256) / 2;
-    my_rect.y = (272 - 256) / 2;
-    my_rect.w = 256;
-    my_rect.h = 256;
-
-    while(true)
+    while (true)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
