@@ -1,50 +1,52 @@
 
 #include <pspkernel.h>
 #include <pspdebug.h>
+#include <pspctrl.h>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "text_generator.h"
+
 PSP_MODULE_INFO("SDL TTF Test", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
-void get_text_and_rect(SDL_Renderer *renderer, int x, int y, char *text,
-                       TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect)
+void init_joystick()
 {
-    int text_width;
-    int text_height;
-    SDL_Surface *surface;
-    SDL_Color textColor = {255, 255, 255, 0};
+    sceCtrlSetSamplingCycle(0);
+    sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+}
 
-    surface = TTF_RenderText_Solid(font, text, textColor);
-    *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    text_width = surface->w;
-    text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = text_width;
-    rect->h = text_height;
+void update_joystick(SceCtrlData &ctrlData)
+{
+    sceCtrlReadBufferPositive(&ctrlData, 1);
 }
 
 int main()
 {
+    SDL_Joystick *joystick = NULL;
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
     SDL_Window *window = SDL_CreateWindow("SDL TTF Test", 0, 0, 480, 272, NULL);
-    TTF_Init();
-    TTF_Font *font = TTF_OpenFont("cambriai.ttf", 24);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, 0, NULL);
+    joystick = SDL_JoystickOpen(0);
 
     SDL_Texture *texture1, *texture2;
     SDL_Rect rect1, rect2;
 
-    get_text_and_rect(renderer, 0, 0, "SDL2 + SDL TTF EXAMPLE", font, &texture1, &rect1);
-    get_text_and_rect(renderer, 0, rect1.y + rect1.h, "Using Cambria Italic, size:24", font, &texture2, &rect2);
+    text_generator *tex_gen = new text_generator("cambriai.ttf", 24, *renderer);
 
-    while (true)
+    bool done = false;
+
+    init_joystick();
+    SceCtrlData ctrlData;
+    while (!done)
     {
+        update_joystick(ctrlData);
+        if(ctrlData.Buttons & PSP_CTRL_HOME) break;
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture1, NULL, &rect1);
-        SDL_RenderCopy(renderer, texture2, NULL, &rect2);
+        tex_gen->gen_text_at_rect(0, 0, "SDL2 + SDL TTF EXAMPLE", &texture1, &rect1);
         SDL_RenderPresent(renderer);
         SDL_UpdateWindowSurface(window);
     }
