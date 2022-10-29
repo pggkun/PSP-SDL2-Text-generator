@@ -28,10 +28,11 @@ int main()
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
     SDL_Window *window = SDL_CreateWindow("SDL TTF Test", 0, 0, 480, 272, NULL);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, 0, NULL);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     joystick = SDL_JoystickOpen(0);
 
-    SDL_Texture *texture1, *texture2;
-    SDL_Rect rect1, rect2;
+    SDL_Texture *texture1;
+    SDL_Rect rect1;
 
     text_generator *tex_gen = new text_generator("cambriai.ttf", 24, *renderer);
 
@@ -51,7 +52,6 @@ int main()
         SDL_UpdateWindowSurface(window);
     }
     SDL_DestroyTexture(texture1);
-    SDL_DestroyTexture(texture2);
     TTF_Quit();
 
     SDL_DestroyRenderer(renderer);
